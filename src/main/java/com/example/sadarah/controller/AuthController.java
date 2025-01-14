@@ -1,24 +1,42 @@
 package com.example.sadarah.controller;
 
 import com.example.sadarah.Request.LoginRequest;
+import com.example.sadarah.Request.SignupRequest;
 import com.example.sadarah.model.User;
 import com.example.sadarah.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
 
-    private final UserService userService;
+    @Autowired
+    private UserService userService;
 
-    public AuthController(UserService userService) {
-        this.userService = userService;
-    }
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
 
     @PostMapping("/signup")
-    public ResponseEntity<User> signup(@RequestBody User user) {
+    public ResponseEntity<User> signup(@RequestBody SignupRequest signupRequest) {
+        String verificationCode = String.valueOf((int) (Math.random() * 900000) + 100000);
+
+        User user = User.builder()
+                .username(signupRequest.getUsername())
+                .password(passwordEncoder.encode(signupRequest.getPassword()))
+                .email(signupRequest.getEmail())
+                .address(signupRequest.getAddress())
+                .isConfirmed(false)
+                .verificationCode(verificationCode)
+                .roles(Set.of("USER"))
+                .build();
+
         User registeredUser = userService.registerUser(user);
         return new ResponseEntity<>(registeredUser, HttpStatus.CREATED);
     }
