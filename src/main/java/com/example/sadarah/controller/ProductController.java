@@ -2,8 +2,15 @@ package com.example.sadarah.controller;
 import com.example.sadarah.model.Product;
 import com.example.sadarah.service.ProductService;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/products")
@@ -16,7 +23,22 @@ public class ProductController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<Product>> getProducts(@RequestParam int page, @RequestParam int size) {
-        return ResponseEntity.ok(productService.getProducts(page, size));
+    public ResponseEntity<Page<Product>> getProducts(Pageable pageable) {
+        return ResponseEntity.ok(productService.getProducts(pageable));
+    }
+
+    @PostMapping
+    public ResponseEntity<Product> createProduct(@RequestBody Product product, @AuthenticationPrincipal UserDetails userDetails) {
+        Set<String> roles = userDetails.getAuthorities()
+                .stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toSet());
+
+        if (!roles.contains("ADMIN")) {
+            return ResponseEntity.status(403).build();
+        }
+
+        Product savedProduct = productService.createProduct(product);
+        return ResponseEntity.ok(savedProduct);
     }
 }

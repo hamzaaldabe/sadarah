@@ -1,5 +1,6 @@
 package com.example.sadarah.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -21,5 +22,6 @@ public class Product {
     private String imageUrl;
 
     @ManyToMany(mappedBy = "products")
+    @JsonIgnore
     private Set<Order> orders;
 }

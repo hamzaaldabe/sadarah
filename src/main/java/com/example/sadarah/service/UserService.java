@@ -32,15 +32,18 @@ public class UserService {
         return userRepository.save(user);
     }
 
-//    public User authenticateUser(String email, String password) {
-//        Optional<User> user = userRepository.findByEmail(email).orElseThrow(new RuntimeException("user not found"));
-//        if (!user.isConfirmed()) {
-//            throw new RuntimeException("Email not confirmed");
-//        }
-//        if (!passwordEncoder.matches(password, user.get().getPassword())) {
-//            throw new RuntimeException("Incorrect password");
-//        }
-//        return user;
-//    }
-
+    public User authenticateUser(String email, String password) {
+        Optional<User> userOptional = userRepository.findByEmail(email);
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            if (!userOptional.get().isConfirmed()) {
+                throw new RuntimeException("Email not confirmed");
+            }
+            if (!passwordEncoder.matches(password, userOptional.get().getPassword())) {
+                throw new RuntimeException("Incorrect password");
+            }
+            return user;
+        }
+        throw new RuntimeException("User not found");
+    }
 }

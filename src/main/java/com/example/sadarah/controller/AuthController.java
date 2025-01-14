@@ -29,20 +29,20 @@ public class AuthController {
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
-//    @PostMapping("/login")
-//    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
-//        try {
-//            User user = userService.authenticateUser(request.getEmail(), request.getPassword());
-//            return ResponseEntity.ok(user);
-//        } catch (RuntimeException e) {
-//            String message = e.getMessage();
-//            return switch (message) {
-//                case "User not found" -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
-//                case "Email not confirmed" -> ResponseEntity.status(HttpStatus.FORBIDDEN).body("Email not confirmed");
-//                case "Incorrect password" -> ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Incorrect password");
-//                default -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred");
-//            };
-//        }
-//    }
-//}
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+        try {
+            User user = userService.authenticateUser(request.getEmail(), request.getPassword());
+            return ResponseEntity.ok(user);
+        } catch (RuntimeException e) {
+            String message = e.getMessage();
+            return switch (message) {
+                case "User not found" -> ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+                case "Email not confirmed" -> ResponseEntity.status(HttpStatus.FORBIDDEN).body("Email not confirmed");
+                case "Incorrect password" -> ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Incorrect password");
+                default -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred");
+            };
+        }
+    }
 }
+

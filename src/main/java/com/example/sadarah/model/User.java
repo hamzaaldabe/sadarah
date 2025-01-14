@@ -1,5 +1,6 @@
 package com.example.sadarah.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -25,11 +26,13 @@ public class User implements UserDetails {
     private String email;
     private String address;
     private boolean isConfirmed;
+    private String verificationCode;
 
     @Column(name = "roles")
     private Set<String> roles;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @JsonIgnore
     private Set<Order> orders;
 
 
