@@ -1,11 +1,11 @@
 package com.example.sadarah.service;
 
-import com.example.sadarah.model.Order;
-import com.example.sadarah.model.OrderStatus;
-import com.example.sadarah.model.Product;
-import com.example.sadarah.model.User;
+import com.example.sadarah.Request.OrderRequest;
+import com.example.sadarah.model.*;
+import com.example.sadarah.repository.OrderProductRepository;
 import com.example.sadarah.repository.OrderRepository;
 import com.example.sadarah.repository.ProductRepository;
+import com.example.sadarah.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -25,20 +25,34 @@ public class OrderService {
     @Autowired
     private ProductRepository productRepository;
 
-    public Order placeOrder(User user, List<Long> productIds) {
-        Set<Product> products = new HashSet<>(productRepository.findAllById(productIds));
+    @Autowired
+    private OrderProductRepository orderProductRepository;
+    @Autowired
+    private UserRepository userRepository;
 
-        if (products.isEmpty()) {
-            throw new IllegalArgumentException("No valid products found for the given IDs");
-        }
-
+    public Order placeOrder(User user, OrderRequest orderRequest) {
+        User user1 = userRepository.findByEmail(user.getEmail())
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
         Order order = Order.builder()
-                .user(user)
-                .products(products)
+                .user(user1)
                 .status(OrderStatus.PENDING)
                 .build();
+        order = orderRepository.save(order);
+        orderRepository.flush();
+        for (OrderRequest.OrderProductRequest orderProductRequest : orderRequest.getProducts()) {
+            Product product = productRepository.findById(orderProductRequest.getProductId())
+                    .orElseThrow(() -> new IllegalArgumentException("Invalid product ID: " + orderProductRequest.getProductId()));
 
-        return orderRepository.save(order);
+            OrderProduct orderProduct = OrderProduct.builder()
+                    .order(order)
+                    .product(product)
+                    .quantity(orderProductRequest.getQuantity())
+                    .build();
+
+            orderProductRepository.save(orderProduct);
+        }
+
+        return order;
     }
 
 

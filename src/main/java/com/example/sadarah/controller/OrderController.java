@@ -1,5 +1,6 @@
 package com.example.sadarah.controller;
 
+import com.example.sadarah.Request.OrderRequest;
 import com.example.sadarah.model.Order;
 import com.example.sadarah.model.OrderStatus;
 import com.example.sadarah.model.Product;
@@ -27,11 +28,10 @@ public class OrderController {
     @PostMapping
     public ResponseEntity<Order> placeOrder(
             @AuthenticationPrincipal User user,
-            @RequestBody List<Long> productIds) {
-        Order order = orderService.placeOrder(User.builder().id(user.getId()).build(), productIds);
+            @RequestBody OrderRequest orderRequest) {
+        Order order = orderService.placeOrder(user, orderRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(order);
     }
-
 
     @GetMapping("/status/{orderId}")
     public ResponseEntity<?> getOrderStatus(@PathVariable Long orderId) {

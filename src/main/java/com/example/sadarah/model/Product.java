@@ -21,7 +21,4 @@ public class Product {
     private double price;
     private String imageUrl;
 
-    @ManyToMany(mappedBy = "products")
-    @JsonIgnore
-    private Set<Order> orders;
 }
