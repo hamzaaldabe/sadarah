@@ -31,11 +31,6 @@ public class User implements UserDetails {
     @Column(name = "roles")
     private Set<String> roles;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    @JsonIgnore
-    private Set<Order> orders;
-
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles.stream()

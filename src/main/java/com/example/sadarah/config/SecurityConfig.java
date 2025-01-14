@@ -29,7 +29,7 @@ public class SecurityConfig {
                         "/webjars/**",
                         "/error",
                         "/v3/**").permitAll()
-                .anyRequest().authenticated()
+                .anyRequest().fullyAuthenticated()
                 .and()
                 .httpBasic();
 
