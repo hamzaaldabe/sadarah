@@ -6,6 +6,7 @@ import com.example.sadarah.Request.LoginRequest;
 import com.example.sadarah.Request.SignupRequest;
 import com.example.sadarah.model.User;
 import com.example.sadarah.service.UserService;
+import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -45,14 +46,20 @@ public class AuthController {
 
         } catch (DuplicateEmailException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        } catch (MessagingException e) {
+            throw new RuntimeException(e);
         }
     }
 
 
     @GetMapping("/confirm")
-    public ResponseEntity<User> confirmEmail(@RequestParam String email) {
-        User user = userService.confirmEmail(email);
-        return new ResponseEntity<>(user, HttpStatus.OK);
+    public ResponseEntity<User> confirmEmail(@RequestParam String email, @RequestParam String verificationCode) {
+        try {
+            User user = userService.confirmEmail(email, verificationCode);
+            return new ResponseEntity<>(user, HttpStatus.OK);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
     }
 
     @PostMapping("/login")

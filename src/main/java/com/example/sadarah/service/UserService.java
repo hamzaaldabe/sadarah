@@ -4,6 +4,7 @@ import com.example.sadarah.Exception.DuplicateEmailException;
 import com.example.sadarah.Exception.UnconfirmedEmailException;
 import com.example.sadarah.model.User;
 import com.example.sadarah.repository.UserRepository;
+import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -20,7 +21,10 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public User registerUser(User user) {
+    @Autowired
+    private EmailService emailService;
+
+    public User registerUser(User user) throws MessagingException {
         if (userRepository.findByEmail(user.getEmail()).isPresent()) {
             throw new DuplicateEmailException("Email already exists: " + user.getEmail());
         }
@@ -28,13 +32,18 @@ public class UserService {
         user.setRoles(Set.of("USER"));
         user.setConfirmed(false);
         userRepository.save(user);
+        emailService.sendVerificationEmail(user.getEmail(), user.getVerificationCode(), user.getUsername());
         return user;
     }
 
-    public User confirmEmail(String email) {
+    public User confirmEmail(String email, String confirmationCode) {
         User user = userRepository.findByEmail(email).orElseThrow();
-        user.setConfirmed(true);
-        return userRepository.save(user);
+        if (user.getVerificationCode().equals(confirmationCode)) {
+            user.setConfirmed(true);
+            userRepository.save(user);
+            return user;
+        }
+        else throw new RuntimeException("Invalid verification code");
     }
 
     public User authenticateUser(String email, String password) {
