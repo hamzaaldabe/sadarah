@@ -29,6 +29,7 @@ public class User implements UserDetails {
     private boolean isConfirmed;
     @JsonIgnore
     private String verificationCode;
+    private String phone;
 
     @Column(name = "roles")
     private Set<String> roles;

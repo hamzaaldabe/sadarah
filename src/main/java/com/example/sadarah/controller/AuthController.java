@@ -39,6 +39,7 @@ public class AuthController {
                     .isConfirmed(false)
                     .verificationCode(verificationCode)
                     .roles(Set.of("USER"))
+                    .phone(signupRequest.getPhone())
                     .build();
 
             User registeredUser = userService.registerUser(user);
