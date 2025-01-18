@@ -16,7 +16,7 @@ public class Config {
                 registry.addMapping("/**")
                         .allowedOrigins("http://localhost:5173")
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH")
-                        .allowedHeaders("Authorization", "Content-Type")
+                        .allowedHeaders("*")
                         .allowCredentials(true);
             }
         };
