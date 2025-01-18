@@ -28,7 +28,7 @@ public class UserService {
         if (userRepository.findByEmail(user.getEmail()).isPresent()) {
             throw new DuplicateEmailException("Email already exists: " + user.getEmail());
         }
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setPassword(user.getPassword());
         user.setRoles(Set.of("USER"));
         user.setConfirmed(false);
         userRepository.save(user);
@@ -50,12 +50,12 @@ public class UserService {
         Optional<User> userOptional = userRepository.findByEmail(email);
         if (userOptional.isPresent()) {
             User user = userOptional.get();
-            user.setVerificationCode(null);
-            if (!user.isConfirmed()) {
-                throw new UnconfirmedEmailException("Email not confirmed", user);
-            }
+
             if (!passwordEncoder.matches(password, userOptional.get().getPassword())) {
                 throw new RuntimeException("Incorrect password");
+            }
+            if (!user.isConfirmed()) {
+                throw new UnconfirmedEmailException("Email not confirmed", user);
             }
             return user;
         }
