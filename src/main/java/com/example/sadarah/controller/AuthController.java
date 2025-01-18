@@ -80,5 +80,13 @@ public class AuthController {
         }
     }
 
+    @PostMapping("/resend-code")
+    public ResponseEntity<?> resendCode(@RequestParam String email) {
+        try {
+            userService.resendVerificationCode(email);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+    }
 }
 

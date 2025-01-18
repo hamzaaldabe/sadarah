@@ -61,4 +61,9 @@ public class UserService {
         }
         throw new RuntimeException("User not found");
     }
+
+    public void resendVerificationCode(String email) {
+        User user = userRepository.findByEmail(email).orElseThrow();
+        emailService.sendVerificationEmail(email, user.getVerificationCode(), user.getUsername());
+    }
 }
