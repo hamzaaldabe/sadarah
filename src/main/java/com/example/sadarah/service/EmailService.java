@@ -15,7 +15,6 @@ public class EmailService {
     private JavaMailSender mailSender;
 
     public void sendVerificationEmail(String toEmail, String verificationCode, String username) throws MessagingException, MessagingException {
-        // Define the email content
         String emailContent = """
             <!DOCTYPE html>
             <html lang="ar">
@@ -90,7 +89,6 @@ public class EmailService {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
-        // Set email parameters
         helper.setTo(toEmail);
         helper.setSubject("تأكيد البريد الإلكتروني");
         helper.setText(emailContent, true);
