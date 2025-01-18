@@ -1,5 +1,7 @@
 package com.example.sadarah.service;
 
+import com.example.sadarah.Exception.DuplicateEmailException;
+import com.example.sadarah.Exception.UnconfirmedEmailException;
 import com.example.sadarah.model.User;
 import com.example.sadarah.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +21,9 @@ public class UserService {
     private PasswordEncoder passwordEncoder;
 
     public User registerUser(User user) {
+        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+            throw new DuplicateEmailException("Email already exists: " + user.getEmail());
+        }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRoles(Set.of("USER"));
         user.setConfirmed(false);
@@ -36,8 +41,9 @@ public class UserService {
         Optional<User> userOptional = userRepository.findByEmail(email);
         if (userOptional.isPresent()) {
             User user = userOptional.get();
-            if (!userOptional.get().isConfirmed()) {
-                throw new RuntimeException("Email not confirmed");
+            user.setVerificationCode(null);
+            if (!user.isConfirmed()) {
+                throw new UnconfirmedEmailException("Email not confirmed", user);
             }
             if (!passwordEncoder.matches(password, userOptional.get().getPassword())) {
                 throw new RuntimeException("Incorrect password");

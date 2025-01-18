@@ -1,6 +1,8 @@
 package com.example.sadarah.service;
 
 import com.example.sadarah.Request.OrderRequest;
+import com.example.sadarah.Response.OrderResponseDTO;
+import com.example.sadarah.Response.ProductResponseDTO;
 import com.example.sadarah.model.*;
 import com.example.sadarah.repository.OrderProductRepository;
 import com.example.sadarah.repository.OrderRepository;
@@ -12,9 +14,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class OrderService {
@@ -65,13 +69,42 @@ public class OrderService {
         return orderRepository.findByUserId(userId, pageable);
     }
 
-    public Page<Order> getAllOrders(Pageable pageable) {
-        return orderRepository.findAll(pageable);
+    public Page<OrderResponseDTO> getAllOrders(Pageable pageable) {
+        Page<Order> ordersPage = orderRepository.findAll(pageable);
+        return getOrderResponseDTOS(ordersPage);
     }
+
+    private Page<OrderResponseDTO> getOrderResponseDTOS(Page<Order> ordersPage) {
+        return ordersPage.map(order -> {
+            List<OrderProduct> orderProducts = orderProductRepository.findByOrderId(order.getId());
+
+            List<ProductResponseDTO> products = orderProducts.stream()
+                    .map(orderProduct -> {
+                        Product product = orderProduct.getProduct();
+                        return new ProductResponseDTO(
+                                product.getId(),
+                                product.getName(),
+                                product.getDescription(),
+                                product.getPrice(),
+                                orderProduct.getQuantity()
+                        );
+                    })
+                    .toList();
+            User user = order.getUser();
+            return new OrderResponseDTO(order.getId(), order.getStatus(), order.getUser(), products);
+        });
+    }
+
 
     public Order updateOrderStatus(Long orderId, OrderStatus status) {
         Order order = orderRepository.findById(orderId).orElseThrow(() -> new RuntimeException("Order not found"));
         order.setStatus(status);
         return orderRepository.save(order);
     }
+
+    public Page<OrderResponseDTO> getOrdersWithProducts(Long userId, Pageable pageable) {
+        Page<Order> ordersPage = orderRepository.findByUserId(userId, pageable);
+        return getOrderResponseDTOS(ordersPage);
+    }
+
 }

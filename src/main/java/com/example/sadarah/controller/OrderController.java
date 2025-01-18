@@ -1,9 +1,9 @@
 package com.example.sadarah.controller;
 
 import com.example.sadarah.Request.OrderRequest;
+import com.example.sadarah.Response.OrderResponseDTO;
 import com.example.sadarah.model.Order;
 import com.example.sadarah.model.OrderStatus;
-import com.example.sadarah.model.Product;
 import com.example.sadarah.model.User;
 import com.example.sadarah.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,9 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Set;
 
 @RestController
 @RequestMapping("/api/orders")
@@ -40,17 +37,19 @@ public class OrderController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<Order>> getOrdersByUserId(@AuthenticationPrincipal User user, Pageable pageable) {
-        return ResponseEntity.ok(orderService.getOrdersByUserId(user.getId(), pageable));
+    public ResponseEntity<Page<OrderResponseDTO>> getUserOrders(
+            @AuthenticationPrincipal User user, Pageable pageable) {
+        Page<OrderResponseDTO> orders = orderService.getOrdersWithProducts(user.getId(), pageable);
+        return ResponseEntity.ok(orders);
     }
 
     @GetMapping("/all")
-    public ResponseEntity<Page<Order>> getAllOrders(Pageable pageable, @AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<Page<OrderResponseDTO>> getAllOrders(Pageable pageable, @AuthenticationPrincipal UserDetails userDetails) {
         if (!userDetails.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ADMIN"))) {
             return ResponseEntity.status(403).build();
         }
 
-        Page<Order> orders = orderService.getAllOrders(pageable);
+        Page<OrderResponseDTO> orders = orderService.getAllOrders(pageable);
         return ResponseEntity.ok(orders);
     }
 

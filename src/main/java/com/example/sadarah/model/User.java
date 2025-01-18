@@ -22,10 +22,12 @@ public class User implements UserDetails {
     private Long id;
 
     private String username;
+    @JsonIgnore
     private String password;
     private String email;
     private String address;
     private boolean isConfirmed;
+    @JsonIgnore
     private String verificationCode;
 
     @Column(name = "roles")
