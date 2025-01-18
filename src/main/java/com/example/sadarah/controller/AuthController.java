@@ -84,6 +84,7 @@ public class AuthController {
     public ResponseEntity<?> resendCode(@RequestParam String email) {
         try {
             userService.resendVerificationCode(email);
+            return new ResponseEntity<>(HttpStatus.OK);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
