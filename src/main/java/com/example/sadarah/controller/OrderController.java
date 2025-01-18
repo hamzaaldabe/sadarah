@@ -58,7 +58,7 @@ public class OrderController {
             @PathVariable Long orderId,
             @RequestParam OrderStatus status,
             @AuthenticationPrincipal UserDetails userDetails) {
-        if (!userDetails.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
+        if (!userDetails.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ADMIN"))) {
             return ResponseEntity.status(403).build();
         }
 
