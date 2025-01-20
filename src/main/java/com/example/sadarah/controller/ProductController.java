@@ -1,5 +1,7 @@
 package com.example.sadarah.controller;
+import com.example.sadarah.Request.EditProductRequest;
 import com.example.sadarah.model.Product;
+import com.example.sadarah.model.User;
 import com.example.sadarah.service.ProductService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,6 +27,34 @@ public class ProductController {
     @GetMapping
     public ResponseEntity<Page<Product>> getProducts(Pageable pageable) {
         return ResponseEntity.ok(productService.getProducts(pageable));
+    }
+
+    @GetMapping("/{productId}")
+    public ResponseEntity<Product> getProduct(@PathVariable Long productId) {
+        try {
+            return ResponseEntity.ok(productService.getProduct(productId));
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PutMapping("/{productId}")
+    public ResponseEntity<Product> updateProduct(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable Long productId, @RequestBody EditProductRequest editProductRequest) {
+        Set<String> roles = userDetails.getAuthorities()
+                .stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toSet());
+
+        if (!roles.contains("ADMIN")) {
+            return ResponseEntity.status(403).build();
+        }
+        try {
+            return ResponseEntity.ok(productService.updateProduct(productId, editProductRequest));
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PostMapping
