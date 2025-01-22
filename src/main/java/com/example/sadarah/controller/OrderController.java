@@ -53,7 +53,7 @@ public class OrderController {
         return ResponseEntity.ok(orders);
     }
 
-    @PatchMapping("/{orderId}/status")
+    @PutMapping("/{orderId}/status")
     public ResponseEntity<Order> changeOrderStatus(
             @PathVariable Long orderId,
             @RequestParam OrderStatus status,

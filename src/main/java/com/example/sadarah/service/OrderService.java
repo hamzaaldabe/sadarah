@@ -86,7 +86,8 @@ public class OrderService {
                                 product.getName(),
                                 product.getDescription(),
                                 product.getPrice(),
-                                orderProduct.getQuantity()
+                                orderProduct.getQuantity(),
+                                product.getImageUrl()
                         );
                     })
                     .toList();
