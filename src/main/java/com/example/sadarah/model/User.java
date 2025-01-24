@@ -31,6 +31,9 @@ public class User implements UserDetails {
     private String verificationCode;
     private String phone;
 
+    @Column(name = "username", insertable=false, updatable=false)
+    private String userName;
+
     @Column(name = "roles")
     private Set<String> roles;
 
@@ -69,5 +72,9 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return this.isConfirmed;
+    }
+
+    public String getUserName(){
+        return this.username;
     }
 }

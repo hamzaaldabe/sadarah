@@ -32,7 +32,7 @@ public class UserService {
         user.setRoles(Set.of("USER"));
         user.setConfirmed(false);
         userRepository.save(user);
-        emailService.sendVerificationEmail(user.getEmail(), user.getVerificationCode(), user.getUsername());
+        emailService.sendVerificationEmail(user.getEmail(), user.getVerificationCode(), user.getUserName());
         return user;
     }
 
@@ -64,6 +64,6 @@ public class UserService {
 
     public void resendVerificationCode(String email) throws MessagingException {
         User user = userRepository.findByEmail(email).orElseThrow();
-        emailService.sendVerificationEmail(email, user.getVerificationCode(), user.getUsername());
+        emailService.sendVerificationEmail(email, user.getVerificationCode(), user.getUserName());
     }
 }
